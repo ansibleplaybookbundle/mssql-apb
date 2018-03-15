@@ -1,0 +1,119 @@
+##############################################################################
+## Provision mssql-server
+## This role executes much of the needed functionality to provision an
+## application using an Ansible Playbook Bundle.  Included in the comments
+## below are some sample resources for getting started deploying an application
+## to OpenShift.
+##############################################################################
+
+
+##############################################################################
+## An OpenShift Origin deployment configuration provides a replication
+## controller, spins up pods, and also provides the ability to transition from
+## one deployment of an image to a new one.
+## https://docs.openshift.org/latest/architecture/core_concepts/deployments.html#deployments-and-deployment-configurations
+##############################################################################
+- name: create deployment config
+  openshift_v1_deployment_config:
+    name: '{{ service_name }}'
+    namespace: '{{ namespace }}'
+    labels:
+      app: '{{ service_name }}'
+      service: '{{ service_name }}'
+    replicas: 1
+    selector:
+      app: '{{ service_name }}'
+      service: '{{ service_name }}'
+    spec_template_metadata_labels:
+      app: '{{ service_name }}'
+      service: '{{ service_name }}'
+    containers:
+    - env:
+      - name: ACCEPT_EULA
+        value: "Y"
+      - name: MSSQL_SA_PASSWORD
+        value: '{{ mssql_sa_pw }}'
+      image: '{{ mssql_image }}:{{ mssql_image_tag }}'
+      name: '{{ service_name }}'
+      livenessProbe:
+        initialDelaySeconds: 30
+        tcpSocket:
+          port: 1433
+        timeoutSeconds: 1
+      readinessProbe:
+        exec:
+          command:
+          - /bin/sh
+          - -i
+          - -c
+          - sqlcmd -S localhost -U SA -P $MSSQL_SA_PASSWORD -Q "SELECT Name from sys.Databases"
+        initialDelaySeconds: 10
+        timeoutSeconds: 1
+      resources:
+        limits:
+          memory: '{{ memory_limit }}'
+        requests:
+          memory: '{{ memory_request }}'
+      ports:
+      - container_port: 1433
+        protocol: TCP
+      volumeMounts:
+      - name: '{{ mssql_data_volume_name }}'
+        mountPath: '{{ mssql_data_path }}'
+    volumes:
+    - name: '{{ mssql_data_volume_name }}'
+      emptyDir: {}
+    state: '{{ state }}'
+
+
+##############################################################################
+## A Kubernetes service serves as an internal load balancer.  It identifies a
+## set of replicated pods in order to proxy the connections it receives to them.
+## https://docs.openshift.org/latest/architecture/core_concepts/pods_and_services.html#services
+##############################################################################
+- name: create '{{ service_name }}' service
+  k8s_v1_service:
+    name: '{{ service_name }}'
+    namespace: '{{ namespace }}'
+    labels:
+      app: '{{ service_name }}'
+      service: '{{ service_name }}'
+    selector:
+      app: '{{ service_name }}'
+      service: '{{ service_name }}'
+    ports:
+      - name: '{{ service_name }}'
+        port: 1433
+        target_port: 1433
+    state: '{{ state }}'
+  register: mssql_service
+
+- name: encode bind credentials
+  asb_encode_binding:
+    fields:
+      DB_TYPE: "mssql"
+      DB_HOST: "{{ service_name }}"
+      DB_PORT: "1433"
+      DB_USER: "SA"
+      DB_PASSWORD: "{{ mssql_sa_pw }}"
+      DB_NAME: "{{ mssql_db }}"
+  when: state == 'present'
+
+
+##############################################################################
+## Create a new database.
+##############################################################################
+- block:
+  - name: Wait for mssql to come up
+    wait_for:
+      port: 1433
+      host: "{{ mssql_service.service.spec.cluster_ip }}"
+      timeout: 300
+
+  - name: Create table
+    mssql_db:
+      login_host: "{{ mssql_service.service.spec.cluster_ip }}"
+      login_user: SA
+      login_password: '{{ mssql_sa_pw }}'
+      name: '{{ mssql_db }}'
+      state: present
