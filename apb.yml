@@ -23,7 +23,7 @@ plans:
       - name: MSSQL_PASSWORD
         required: True
         default: "yourStrong@Password"
-        pattern: "^[a-zA-Z0-9_.-]*$"
+        pattern: "^[a-zA-Z0-9!@#$%^&*+=]{8,}$"
         type: string
         display_type: password
         title: "Password for the database admin user."

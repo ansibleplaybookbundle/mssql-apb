@@ -46,7 +46,7 @@
           - /bin/sh
           - -i
           - -c
-          - sqlcmd -S localhost -U SA -P $MSSQL_SA_PASSWORD -Q "SELECT Name from sys.Databases"
+          - sqlcmd -S localhost -U SA -P "$MSSQL_SA_PASSWORD" -Q "SELECT Name from sys.Databases"
         initialDelaySeconds: 10
         timeoutSeconds: 1
       resources:
