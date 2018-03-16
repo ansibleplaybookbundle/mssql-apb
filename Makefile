@@ -1,6 +1,6 @@
 DOCKERHOST = docker.io
-DOCKERORG = tchughesiv
-IMAGENAME = mssql-server-apb
+DOCKERORG = ansibleplaybookbundle
+IMAGENAME = mssql-apb
 TAG = latest
 USER=$(shell id -u)
 PWD=$(shell pwd)
