@@ -8,3 +8,5 @@
   - role: ansibleplaybookbundle.asb-modules
   - role: provision-mssql-apb
     playbook_debug: false
+  vars:
+    action: provision

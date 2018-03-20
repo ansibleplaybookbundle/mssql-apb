@@ -1,12 +1,15 @@
+---
 version: 1.0
 name: mssql-apb
 description: APB to deploy SQL Server on Linux
-bindable: True
+bindable: true
 async: optional
 metadata:
   displayName: SQL Server on Linux (APB)
-  imageUrl: https://raw.githubusercontent.com/ansibleplaybookbundle/mssql-apb/master/docs/img/sql-server.png
-  documentationUrl: https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-overview
+  imageUrl:
+    https://raw.githubusercontent.com/ansibleplaybookbundle/mssql-apb/master/docs/img/sql-server.png
+  documentationUrl:
+    https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-overview
   serviceName: mssql-server
   dependencies: ['docker.io/tchughesiv/mssql-server-linux']
 tags:
@@ -14,23 +17,29 @@ tags:
 plans:
   - name: ephemeral
     description: This plan deploys an ephemeral mssql-server.
-    free: True
-    default: True
+    free: true
+    default: true
     metadata:
       displayName: Ephemeral installation
-      longDescription: This plan will deploy a MS SQL Server standalone using ephemeral storage
+      longDescription:
+        This plan will deploy a MS SQL Server on Linux standalone
+        using ephemeral storage
     parameters:
       - name: MSSQL_PASSWORD
-        required: True
+        required: true
         default: "yourStrong@Password"
         pattern: "^[a-zA-Z0-9!@#$%^&*+=]{8,}$"
         type: string
         display_type: password
-        title: "Password for the database admin user."
-        description: "The password should follow the SQL Server default password policy, otherwise the container can not setup SQL server and will stop working. By default, the password must be at least 8 characters long and contain characters from three of the following four sets: Uppercase letters, Lowercase letters, Base 10 digits, and Symbols. You can examine the error log by executing the docker logs command."
+        title: "Password for the database admin (SA) user."
+        description:
+          "The password must be at least 8 characters long and contain
+          characters from three of the following four sets: Uppercase
+          letters, Lowercase letters, Base 10 digits, and Symbols. You
+          can examine the error log by executing the docker logs command."
         display_group: MS SQL Config
       - name: MSSQL_DATABASE
-        required: True
+        required: true
         default: sampledb
         pattern: "^[a-zA-Z0-9_-]*$"
         type: string

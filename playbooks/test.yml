@@ -1,0 +1,16 @@
+- name: "[MSSQL-APB][TEST] Test MSSQL APB"
+  hosts: localhost
+  gather_facts: False
+  connection: local
+  vars:
+    finish_tests: False
+    action: test
+  roles:
+  - role: ansible.kubernetes-modules
+    install_python_requirements: no
+    playbook_debug: True
+  - role: ansibleplaybookbundle.asb-modules
+  post_tasks:
+  - name: "[TEST] Load testing tasks"
+    import_tasks: test_tasks.yml
+ 
