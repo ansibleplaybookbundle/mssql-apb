@@ -109,7 +109,7 @@
       DB_ADMIN_USER: "SA"
       DB_ADMIN_PASSWORD: "{{ mssql_sa_pw }}"
       DB_NAME: "{{ mssql_db }}"
-  when: state == 'present'
+  when: action == 'provision'
 
 
 ##############################################################################
