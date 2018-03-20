@@ -24,3 +24,12 @@
     name: mssql-server
     namespace: '{{ namespace }}'
     state: absent
+
+
+##############################################################################
+## Deprovision a secret
+##############################################################################
+- k8s_v1_secret:
+    name: mssql-server
+    namespace: '{{ namespace }}'
+    state: absent

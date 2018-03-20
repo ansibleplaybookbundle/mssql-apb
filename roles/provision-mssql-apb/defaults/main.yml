@@ -1,6 +1,5 @@
 ---
 service_name: "mssql-server"
-app_name: "{{ service_name }}-apb"
 mssql_image_tag: "{{ MSSQL_IMAGE_TAG | default('latest') }}"
 mssql_image: "docker.io/tchughesiv/mssql-server-linux"
 mssql_data_volume_name: "{{ service_name }}-data"
