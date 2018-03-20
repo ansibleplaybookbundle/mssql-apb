@@ -5,6 +5,19 @@
 ## below are some sample resources for getting started deploying an application
 ## to OpenShift.
 ##############################################################################
+#- name: create a unique id
+#  shell: "echo $RANDOM | tr '[0-9]' '[a-zA-Z]'"
+#  register: my_unique_id
+
+- name: create secret
+  k8s_v1_secret:
+#    name: '{{ service_name }}-{{ my_unique_id.stdout }}'
+    name: '{{ service_name }}'
+    namespace: '{{ namespace }}'
+    string_data:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: '{{ mssql_sa_pw }}'
+    state: '{{ state }}'
 
 
 ##############################################################################
@@ -28,11 +41,10 @@
       app: '{{ service_name }}'
       service: '{{ service_name }}'
     containers:
-    - env:
-      - name: ACCEPT_EULA
-        value: "Y"
-      - name: MSSQL_SA_PASSWORD
-        value: '{{ mssql_sa_pw }}'
+    - envFrom:
+      - secretRef:
+#          name: '{{ service_name }}-{{ my_unique_id.stdout }}'
+          name: '{{ service_name }}'
       image: '{{ mssql_image }}:{{ mssql_image_tag }}'
       name: '{{ service_name }}'
       livenessProbe:
@@ -94,8 +106,8 @@
       DB_TYPE: "mssql"
       DB_HOST: "{{ service_name }}"
       DB_PORT: "1433"
-      DB_USER: "SA"
-      DB_PASSWORD: "{{ mssql_sa_pw }}"
+      DB_ADMIN_USER: "SA"
+      DB_ADMIN_PASSWORD: "{{ mssql_sa_pw }}"
       DB_NAME: "{{ mssql_db }}"
   when: state == 'present'
 
