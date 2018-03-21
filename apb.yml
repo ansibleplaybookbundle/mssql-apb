@@ -28,7 +28,13 @@ plans:
       - name: MSSQL_PASSWORD
         required: true
         default: "yourStrong@Password"
-        pattern: "^[a-zA-Z0-9!@#$%^&*+=]{8,}$"
+        pattern: "^(?:(?:[a-z]+.*[A-Z]+.*(\\d|\\W)+.*)\
+          |(?:[A-Z]+.*[a-z]+.*(\\d|\\W)+.*)\
+          |(?:(\\d|\\W)+.*[a-z].*[A-Z].*)|(?:(\\d|\\W)+.*[A-Z]+.*[a-z]+.*)\
+          |(?:[A-Z]+.*(\\d|\\W)+.*[a-z]+.*)|(?:[a-z]+.*(\\d|\\W)+.*[A-Z]+.*)\
+          |(?:\\d+.*\\W+.*([A-Z]|[a-z])+.*)|(?:\\W+.*\\d+.*([A-Z]|[a-z])+.*)\
+          |(?:([A-Z]|[a-z])+.*\\d+.*\\W+.*)|(?:([A-Z]|[a-z])+.*\\W+.*\\d+.*)\
+          |(?:\\W+.*([A-Z]|[a-z])+.*\\d+.*)|(?:\\d+.*([A-Z]|[a-z])+.*\\W+.*))$"
         type: string
         display_type: password
         title: "Password for the database admin (SA) user."
@@ -38,6 +44,8 @@ plans:
           letters, Lowercase letters, Base 10 digits, and Symbols. You
           can examine the error log by executing the docker logs command."
         display_group: MS SQL Config
+        min_length: 8
+        max_length: 128
       - name: MSSQL_DATABASE
         required: true
         default: sampledb
