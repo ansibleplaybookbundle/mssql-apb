@@ -5,6 +5,7 @@
   vars:
     finish_tests: False
     action: test
+    _apb_service_instance_id: 15c0e133-2a28-4795-a428-638a28c36072
   roles:
   - role: ansible.kubernetes-modules
     install_python_requirements: no
