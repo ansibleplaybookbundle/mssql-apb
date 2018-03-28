@@ -6,6 +6,7 @@
     finish_tests: False
     action: test
     _apb_service_instance_id: 15c0e133-2a28-4795-a428-638a28c36072
+    _apb_plan_id: ephemeral
   roles:
   - role: ansible.kubernetes-modules
     install_python_requirements: no
@@ -14,4 +15,3 @@
   post_tasks:
   - name: "[TEST] Load testing tasks"
     import_tasks: test_tasks.yml
- 
