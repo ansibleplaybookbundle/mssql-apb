@@ -10,9 +10,9 @@
 ## Deprovision a service
 ##############################################################################
 - k8s_v1_service:
-    name: '{{ service_name }}-{{ _apb_service_instance_id }}'
+    name: '{{ service_instance }}'
     namespace: '{{ namespace }}'
-    state: absent
+    state: '{{ state }}'
 
 
 ##############################################################################
@@ -21,15 +21,15 @@
 ## its associated resources like replication controllers and pods
 ##############################################################################
 - openshift_v1_deployment_config:
-    name: '{{ service_name }}-{{ _apb_service_instance_id }}' 
+    name: '{{ service_instance }}' 
     namespace: '{{ namespace }}'
-    state: absent
+    state: '{{ state }}'
 
 
 ##############################################################################
 ## Deprovision a secret
 ##############################################################################
 - k8s_v1_secret:
-    name: '{{ service_name }}-{{ _apb_service_instance_id }}'
+    name: '{{ service_instance }}'
     namespace: '{{ namespace }}'
-    state: absent
+    state: '{{ state }}'
