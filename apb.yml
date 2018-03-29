@@ -26,7 +26,7 @@ plans:
     parameters:
       - name: MSSQL_PASSWORD
         required: true
-        default: "yourStrong@Password"
+        default: "Hello123!"
         pattern: "^(?:(?:[a-z]+.*[A-Z]+.*(\\d|\\W)+.*)\
           |(?:[A-Z]+.*[a-z]+.*(\\d|\\W)+.*)\
           |(?:(\\d|\\W)+.*[a-z].*[A-Z].*)|(?:(\\d|\\W)+.*[A-Z]+.*[a-z]+.*)\

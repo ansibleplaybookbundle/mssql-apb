@@ -1,16 +1,14 @@
-- name: "[MSSQL-APB][TEST] Test MSSQL APB"
+- name: "[MSSQL-APB] [TEST] Test MSSQL APB"
   hosts: localhost
-  gather_facts: False
+  gather_facts: false
   connection: local
-  vars:
-    action: test
-    _apb_service_instance_id: 15c0e133-2a28-4795-a428-638a28c36072
-    _apb_plan_id: ephemeral
   roles:
   - role: ansible.kubernetes-modules
     install_python_requirements: no
-    playbook_debug: True
   - role: ansibleplaybookbundle.asb-modules
-  post_tasks:
-  - name: "[TEST] Load testing tasks"
-    import_tasks: test_tasks.yml
+  - role: provision-mssql-apb
+  - role: deprovision-mssql-apb
+  vars:
+    action: test
+    _apb_service_instance_id: 15c0e133-2a28-4795-a428-638a28c36072
+    _apb_plan_id: persistent

@@ -1,9 +1,0 @@
----
-- block:
-  - name: "Deploy & Verify MSSQL role"
-    include_role:
-      name: provision-mssql-apb
-
-  - name: "Deprovision MSSQL role"
-    include_role:
-      name: deprovision-mssql-apb
