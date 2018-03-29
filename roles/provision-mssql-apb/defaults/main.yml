@@ -10,8 +10,8 @@ mssql_data_volume_name: "{{ service_name }}-data"
 mssql_data_path: "/var/opt"
 
 mssql_db: "{{ MSSQL_DATABASE | default('sampledb') }}"
-mssql_sa_pw: "{{ MSSQL_PASSWORD | default('yourStrong@Password') }}"
+mssql_sa_pw: "{{ MSSQL_PASSWORD | default('Hello123!') }}"
 
 volume_size: "{{ MSSQL_DATA_STORAGE_SIZE | default('1') }}Gi"
-memory_limit: "{{ MSSQL_MEMORY_LIMIT | default('2') }}Gi"
-memory_request: "{{ MSSQL_MEMORY_REQUEST | default('1') }}Gi"
+memory_limit: "{{ MSSQL_MEMORY_LIMIT | default('3') }}Gi"
+memory_request: "{{ MSSQL_MEMORY_REQUEST | default('2') }}Gi"

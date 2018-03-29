@@ -1,9 +1,5 @@
 ---
 - block:
-  - name: "Create new project"
-    openshift_v1_project:
-      name: '{{ namespace }}'
-
   - name: "Deploy & Verify MSSQL role"
     include_role:
       name: provision-mssql-apb
@@ -11,8 +7,3 @@
   - name: "Deprovision MSSQL role"
     include_role:
       name: deprovision-mssql-apb
-
-  - name: "Delete test project"
-    openshift_v1_project:
-      name: '{{ namespace }}'
-  when: not finish_tests | bool

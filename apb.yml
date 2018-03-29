@@ -80,7 +80,7 @@ plans:
     parameters:
       - name: MSSQL_PASSWORD
         required: true
-        default: "yourStrong@Password"
+        default: "Hello123!"
         pattern: "^(?:(?:[a-z]+.*[A-Z]+.*(\\d|\\W)+.*)\
           |(?:[A-Z]+.*[a-z]+.*(\\d|\\W)+.*)\
           |(?:(\\d|\\W)+.*[a-z].*[A-Z].*)|(?:(\\d|\\W)+.*[A-Z]+.*[a-z]+.*)\
@@ -114,14 +114,14 @@ plans:
         display_group: Environment Sizing
       - name: MSSQL_MEMORY_LIMIT
         required: true
-        default: 2
+        default: 3
         type: integer
         title:
           Maximum amount of memory the container can use (in Gi) eg 512Mi 1Gi
         display_group: Environment Sizing
       - name: MSSQL_MEMORY_REQUEST
         required: true
-        default: 1
+        default: 2
         type: integer
         title:
           Requested amount of memory for the container to start (in Gi)
