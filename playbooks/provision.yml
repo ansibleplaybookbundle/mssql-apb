@@ -7,6 +7,5 @@
     install_python_requirements: no
   - role: ansibleplaybookbundle.asb-modules
   - role: provision-mssql-apb
-    playbook_debug: false
   vars:
     action: provision
