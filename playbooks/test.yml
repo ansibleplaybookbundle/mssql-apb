@@ -3,7 +3,6 @@
   gather_facts: False
   connection: local
   vars:
-    finish_tests: False
     action: test
     _apb_service_instance_id: 15c0e133-2a28-4795-a428-638a28c36072
     _apb_plan_id: ephemeral
