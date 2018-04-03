@@ -13,6 +13,7 @@ metadata:
   dependencies: ['docker.io/tchughesiv/mssql-server-linux']
 tags:
   - database
+  - mssql
 plans:
   - name: ephemeral
     description: This plan deploys an ephemeral MS SQL Server.
@@ -40,8 +41,7 @@ plans:
         description:
           "The password must be at least 8 characters long and contain
           characters from three of the following four sets: Uppercase
-          letters, Lowercase letters, Base 10 digits, and Symbols. You
-          can examine the error log by executing the docker logs command."
+          letters, Lowercase letters, Base 10 digits, and Symbols."
         display_group: MS SQL Config
         min_length: 8
         max_length: 128
@@ -54,24 +54,22 @@ plans:
         display_group: MS SQL Config
       - name: MSSQL_MEMORY_LIMIT
         required: true
-        default: 2
+        default: 3
         type: integer
         title:
-          Maximum amount of memory the container can use (in Gi) eg 512Mi 1Gi
+          Maximum amount of memory the container can use (in Gi) eg 1Gi 2Gi
         display_group: Environment Sizing
       - name: MSSQL_MEMORY_REQUEST
         required: true
-        default: 1
+        default: 2
         type: integer
         title:
           Requested amount of memory for the container to start (in Gi)
           eg 1Gi 2Gi
         display_group: Environment Sizing
-
   - name: persistent
     description: This plan deploys a persistent MS SQL Server.
     free: true
-    default: false
     metadata:
       displayName: Persistent installation
       longDescription:
@@ -94,8 +92,7 @@ plans:
         description:
           "The password must be at least 8 characters long and contain
           characters from three of the following four sets: Uppercase
-          letters, Lowercase letters, Base 10 digits, and Symbols. You
-          can examine the error log by executing the docker logs command."
+          letters, Lowercase letters, Base 10 digits, and Symbols."
         display_group: MS SQL Config
         min_length: 8
         max_length: 128
@@ -110,14 +107,14 @@ plans:
         required: true
         default: 1
         type: integer
-        title: Persistent volume size for db data (in Gi) eg 512Mi 1Gi
+        title: Persistent volume size for db data (in Gi) eg 1Gi 2Gi
         display_group: Environment Sizing
       - name: MSSQL_MEMORY_LIMIT
         required: true
         default: 3
         type: integer
         title:
-          Maximum amount of memory the container can use (in Gi) eg 512Mi 1Gi
+          Maximum amount of memory the container can use (in Gi) eg 1Gi 2Gi
         display_group: Environment Sizing
       - name: MSSQL_MEMORY_REQUEST
         required: true
