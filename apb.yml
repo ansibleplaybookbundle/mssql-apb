@@ -1,7 +1,7 @@
 ---
 version: 1.0
 name: mssql-apb
-description: APB to deploy Microsoft SQL Server on Linux 2017 Developer Edition
+description: APB to deploy Microsoft SQL Server on Linux 2017
 bindable: true
 async: optional
 metadata:
@@ -47,26 +47,57 @@ plans:
         max_length: 128
       - name: MSSQL_DATABASE
         required: true
-        default: sampledb
+        default: TestDB
         pattern: "^[a-zA-Z0-9_-]*$"
         type: string
         title: Name of the MS SQL database accessed
+        display_group: MS SQL Config
+      - name: MSSQL_PID
+        required: true
+        type: enum
+        enum: ['Evaluation', 'Developer', 'Express']
+        default: Developer
+        title: Set the SQL Server edition.
+        display_group: MS SQL Config
+      - name: MSSQL_AGENT_ENABLED
+        title: Enable SQL Server Agent.
+        type: boolean
+        required: true
+        default: false
+        description: By default, agent is disabled.
+        display_group: MS SQL Config
+      - name: MSSQL_LCID
+        title: Set the language ID.
+        type: integer
+        required: true
+        default: 1033
+        description: For example - 1033 is English (US), 1036 is French.
+        min_length: 4
+        max_length: 4
+        display_group: MS SQL Config
+      - name: MSSQL_IMAGE_PULL
+        title: "DeploymentConfig Image pull policy"
+        type: enum
+        enum: ['Always', 'IfNotPresent', 'Never']
+        required: true
+        default: IfNotPresent
         display_group: MS SQL Config
       - name: MSSQL_MEMORY_LIMIT
         required: true
         default: 3
         type: integer
         title:
-          Maximum amount of memory the container can use (in Gi) eg 1Gi 2Gi
+          Maximum amount of memory the container can use (in GB) eg 1GB 2GB
         display_group: Environment Sizing
       - name: MSSQL_MEMORY_REQUEST
         required: true
         default: 2
         type: integer
         title:
-          Requested amount of memory for the container to start (in Gi)
-          eg 1Gi 2Gi
+          Requested amount of memory for the container to start (in GB)
+          eg 1GB 2GB
         display_group: Environment Sizing
+
   - name: persistent
     description: This plan deploys a persistent MS SQL Server.
     free: true
@@ -98,29 +129,59 @@ plans:
         max_length: 128
       - name: MSSQL_DATABASE
         required: true
-        default: sampledb
+        default: TestDB
         pattern: "^[a-zA-Z0-9_-]*$"
         type: string
         title: Name of the MS SQL database accessed
+        display_group: MS SQL Config
+      - name: MSSQL_PID
+        required: true
+        type: enum
+        enum: ['Evaluation', 'Developer', 'Express']
+        default: Developer
+        title: Set the SQL Server edition.
+        display_group: MS SQL Config
+      - name: MSSQL_AGENT_ENABLED
+        title: Enable SQL Server Agent.
+        type: boolean
+        required: true
+        default: false
+        description: By default, agent is disabled.
+        display_group: MS SQL Config
+      - name: MSSQL_LCID
+        title: Set the language ID.
+        type: integer
+        required: true
+        default: 1033
+        description: For example - 1033 is English (US), 1036 is French.
+        min_length: 4
+        max_length: 4
+        display_group: MS SQL Config
+      - name: MSSQL_IMAGE_PULL
+        title: "DeploymentConfig Image pull policy"
+        type: enum
+        enum: ['Always', 'IfNotPresent', 'Never']
+        required: true
+        default: IfNotPresent
         display_group: MS SQL Config
       - name: MSSQL_DATA_STORAGE_SIZE
         required: true
         default: 1
         type: integer
-        title: Persistent volume size for db data (in Gi) eg 1Gi 2Gi
+        title: Persistent volume size for db data (in GB) eg 1GB 2GB
         display_group: Environment Sizing
       - name: MSSQL_MEMORY_LIMIT
         required: true
         default: 3
         type: integer
         title:
-          Maximum amount of memory the container can use (in Gi) eg 1Gi 2Gi
+          Maximum amount of memory the container can use (in GB) eg 1GB 2GB
         display_group: Environment Sizing
       - name: MSSQL_MEMORY_REQUEST
         required: true
         default: 2
         type: integer
         title:
-          Requested amount of memory for the container to start (in Gi)
-          eg 1Gi 2Gi
+          Requested amount of memory for the container to start (in GB)
+          eg 1GB 2GB
         display_group: Environment Sizing

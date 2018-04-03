@@ -6,7 +6,7 @@
 
 ![img](docs/img/sql-server.png)
 
-Deploy Microsoft SQL Server on Linux 2017 (Developer Edition) into your Openshift project via APB
+Deploy Microsoft SQL Server on Linux 2017 into your Openshift project via APB
 
 ## Plans
 
