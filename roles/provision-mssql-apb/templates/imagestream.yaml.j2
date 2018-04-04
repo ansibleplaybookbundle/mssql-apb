@@ -11,7 +11,7 @@ spec:
       kind: DockerImage
       name: {{ mssql_image }}:{{ mssql_image_tag }}
     importPolicy:
-      scheduled: true
+      scheduled: {{ mssql_is_scheduled }}
     name: {{ mssql_image_tag }}
     referencePolicy:
       type: Source

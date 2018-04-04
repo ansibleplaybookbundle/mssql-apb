@@ -56,4 +56,4 @@ jobs:
       - docker push "${REGISTRY}/${APB_NAME}/${APB_NAME}"
       - oc create sa apb
       - oc adm policy add-role-to-user admin -z apb
-      - oc run "${APB_NAME}-test" -it --restart='Never' --image "${REGISTRY}/${APB_NAME}/${APB_NAME}" --env "OPENSHIFT_TOKEN=${OC_PASS}" --env "OPENSHIFT_TARGET=https://kubernetes.default.svc" --env "POD_NAME=${APB_NAME}-test" --env "POD_NAMESPACE=${APB_NAME}" --overrides='{"apiVersion":"v1","spec":{"serviceAccountName":"apb"}}' -- test -e namespace=${APB_NAME} -e MSSQL_MEMORY_REQUEST=1 -v
+      - oc run "${APB_NAME}-test" -it --restart='Never' --image "${REGISTRY}/${APB_NAME}/${APB_NAME}" --env "OPENSHIFT_TOKEN=${OC_PASS}" --env "OPENSHIFT_TARGET=https://kubernetes.default.svc" --env "POD_NAME=${APB_NAME}-test" --env "POD_NAMESPACE=${APB_NAME}" --overrides='{"apiVersion":"v1","spec":{"serviceAccountName":"apb"}}' -- test -e namespace=${APB_NAME} -v

@@ -5,6 +5,17 @@
 ## below are some sample resources for getting started deploying an application
 ## to OpenShift.
 ##############################################################################
+- name: Encode bind credentials
+  asb_encode_binding:
+    fields:
+      DB_TYPE: "mssql"
+      DB_HOST: "{{ service_instance }}"
+      DB_PORT: "1433"
+      DB_ADMIN_USER: "SA"
+      DB_ADMIN_PASSWORD: "{{ mssql_sa_pw }}"
+      DB_NAME: "{{ mssql_db }}"
+  when: action == 'provision'
+
 - name: Process ImageStream from template
   template:
     src: imagestream.yaml.j2
@@ -83,18 +94,18 @@
     strategy_type: Recreate
     strategy_recreate_params:
       post:
-        failurePolicy: Retry
+        failurePolicy: Ignore
         execNewPod:
           containerName: '{{ service_name }}'
-          env: 
+          env:
             - name: MSSQL_SA_PASSWORD
               valueFrom:
-              - secretKeyRef:
+                secretKeyRef:
                   name: '{{ service_instance }}'
                   key: MSSQL_SA_PASSWORD
           command:
+            - uid_entrypoint
             - /bin/sh
-            - -i
             - -c
             - |
               sqlcmd -S {{ service_instance }} -U SA -P "$MSSQL_SA_PASSWORD" -Q "IF DB_ID('{{ mssql_db }}') IS NULL
@@ -146,12 +157,12 @@
     - type: ConfigChange
     - type: ImageChange
       image_change_params:
-        automatic: false
+        automatic: true
         container_names:
           - '{{ service_name }}'
         _from:
           kind: ImageStreamTag
-          name: mssql-server-linux:latest
+          name: 'mssql-server-linux:{{ mssql_image_tag }}'
           namespace: '{{ namespace }}'
     state: '{{ state }}'
   when: _apb_plan_id != "persistent"
@@ -167,18 +178,18 @@
     strategy_type: Recreate
     strategy_recreate_params:
       post:
-        failurePolicy: Retry
+        failurePolicy: Ignore
         execNewPod:
           containerName: '{{ service_name }}'
-          env: 
+          env:
             - name: MSSQL_SA_PASSWORD
               valueFrom:
-              - secretKeyRef:
+                secretKeyRef:
                   name: '{{ service_instance }}'
                   key: MSSQL_SA_PASSWORD
           command:
+            - uid_entrypoint
             - /bin/sh
-            - -i
             - -c
             - |
               sqlcmd -S {{ service_instance }} -U SA -P "$MSSQL_SA_PASSWORD" -Q "IF DB_ID('{{ mssql_db }}') IS NULL
@@ -231,23 +242,31 @@
     - type: ConfigChange
     - type: ImageChange
       image_change_params:
-        automatic: false
+        automatic: true
         container_names:
           - '{{ service_name }}'
         _from:
           kind: ImageStreamTag
-          name: mssql-server-linux:latest
+          name: 'mssql-server-linux:{{ mssql_image_tag }}'
           namespace: '{{ namespace }}'
     state: '{{ state }}'
   when: _apb_plan_id == "persistent"
 
-- name: Encode bind credentials
-  asb_encode_binding:
-    fields:
-      DB_TYPE: "mssql"
-      DB_HOST: "{{ service_instance }}"
-      DB_PORT: "1433"
-      DB_ADMIN_USER: "SA"
-      DB_ADMIN_PASSWORD: "{{ mssql_sa_pw }}"
-      DB_NAME: "{{ mssql_db }}"
-  when: action == 'provision'
+
+##############################################################################
+## Create a new database.
+##############################################################################
+- block:
+  - name: Wait for mssql to come up
+    wait_for:
+      port: 1433
+      host: "{{ mssql_service.service.spec.cluster_ip }}"
+      timeout: 300
+
+  - name: Create table
+    mssql_db:
+      login_host: "{{ mssql_service.service.spec.cluster_ip }}"
+      login_user: SA
+      login_password: '{{ mssql_sa_pw }}'
+      name: '{{ mssql_db }}'
+      state: '{{ state }}'
