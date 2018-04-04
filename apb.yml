@@ -50,7 +50,7 @@ plans:
         default: TestDB
         pattern: "^[a-zA-Z0-9_-]*$"
         type: string
-        title: Name of the MS SQL database accessed
+        title: Name of the MS SQL database to create.
         display_group: MS SQL Config
       - name: MSSQL_PID
         required: true
@@ -80,7 +80,7 @@ plans:
         type: enum
         enum: ['Always', 'IfNotPresent', 'Never']
         required: true
-        default: IfNotPresent
+        default: Always
         display_group: MS SQL Config
       - name: MSSQL_MEMORY_LIMIT
         required: true
@@ -132,7 +132,7 @@ plans:
         default: TestDB
         pattern: "^[a-zA-Z0-9_-]*$"
         type: string
-        title: Name of the MS SQL database accessed
+        title: Name of the MS SQL database to create.
         display_group: MS SQL Config
       - name: MSSQL_PID
         required: true
@@ -162,7 +162,7 @@ plans:
         type: enum
         enum: ['Always', 'IfNotPresent', 'Never']
         required: true
-        default: IfNotPresent
+        default: Always
         display_group: MS SQL Config
       - name: MSSQL_DATA_STORAGE_SIZE
         required: true

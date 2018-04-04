@@ -1,0 +1,17 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: mssql-server-linux
+  namespace: {{ namespace }}
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+  - from:
+      kind: DockerImage
+      name: {{ mssql_image }}:{{ mssql_image_tag }}
+    importPolicy:
+      scheduled: true
+    name: {{ mssql_image_tag }}
+    referencePolicy:
+      type: Source
