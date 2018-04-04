@@ -12,7 +12,7 @@
     access_modes:
       - ReadWriteOnce
     resources_requests:
-      storage: '{{ volume_size }}'
+      storage: '{{ volume_size }}G'
     state: '{{ state }}'
   when: _apb_plan_id == "persistent"
 
@@ -24,9 +24,9 @@
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: '{{ mssql_sa_pw }}'
       MSSQL_PID: '{{ mssql_pid }}'
-      MSSQL_LCID: '{{ mssql_lcid }}'
-      MSSQL_AGENT_ENABLED: '{{ mssql_agent }}'
-      MSSQL_MEMORY_LIMIT_MB: '{{ memory_limit * 1000 }}'
+      MSSQL_LCID: '{{ mssql_lcid | string }}'
+      MSSQL_AGENT_ENABLED: '{{ mssql_agent | string }}'
+      MSSQL_MEMORY_LIMIT_MB: '{{ (( memory_limit | int ) * 1000 ) | string }}'
     state: '{{ state }}'
 
 
@@ -74,9 +74,9 @@
         timeoutSeconds: 1
       resources:
         limits:
-          memory: '{{ memory_limit }}'
+          memory: '{{ memory_limit }}G'
         requests:
-          memory: '{{ memory_request }}'
+          memory: '{{ memory_request }}G'
       ports:
       - container_port: 1433
         protocol: TCP
@@ -127,9 +127,9 @@
         timeoutSeconds: 1
       resources:
         limits:
-          memory: '{{ memory_limit }}'
+          memory: '{{ memory_limit }}G'
         requests:
-          memory: '{{ memory_request }}'
+          memory: '{{ memory_request }}G'
       ports:
       - container_port: 1433
         protocol: TCP
