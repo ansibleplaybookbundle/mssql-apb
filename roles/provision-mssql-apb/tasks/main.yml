@@ -5,7 +5,20 @@
 ## below are some sample resources for getting started deploying an application
 ## to OpenShift.
 ##############################################################################
-- name: create pvc for persistent deployment
+- name: Process ImageStream from template
+  template:
+    src: imagestream.yaml.j2
+    dest: "/tmp/imagestream.yaml"
+  register: is
+
+- name: Create ImageStream
+  openshift_v1_image_stream:
+    name: mssql-server-linux
+    namespace: "{{ namespace}}"
+    state: present
+    src: "{{ is.dest | default(is.path) }}"
+
+- name: Create PVC for persistent deployment
   k8s_v1_persistent_volume_claim:
     name: '{{ service_instance }}'
     namespace: '{{ namespace }}'
@@ -16,7 +29,7 @@
     state: '{{ state }}'
   when: _apb_plan_id == "persistent"
 
-- name: create secret
+- name: Create secret
   k8s_v1_secret:
     name: '{{ service_instance }}'
     namespace: '{{ namespace }}'
@@ -31,12 +44,35 @@
 
 
 ##############################################################################
+## A Kubernetes service serves as an internal load balancer.  It identifies a
+## set of replicated pods in order to proxy the connections it receives to them.
+## https://docs.openshift.org/latest/architecture/core_concepts/pods_and_services.html#services
+##############################################################################
+- name: Create '{{ service_instance }}' service
+  k8s_v1_service:
+    name: '{{ service_instance }}'
+    namespace: '{{ namespace }}'
+    labels:
+      app: '{{ service_instance }}'
+      service: '{{ service_instance }}'
+    selector:
+      app: '{{ service_instance }}'
+      service: '{{ service_instance }}'
+    ports:
+      - name: '{{ service_name }}'
+        port: 1433
+        target_port: 1433
+    state: '{{ state }}'
+  register: mssql_service
+
+
+##############################################################################
 ## An OpenShift Origin deployment configuration provides a replication
 ## controller, spins up pods, and also provides the ability to transition from
 ## one deployment of an image to a new one.
 ## https://docs.openshift.org/latest/architecture/core_concepts/deployments.html#deployments-and-deployment-configurations
 ##############################################################################
-- name: create ephemeral deployment config
+- name: Create ephemeral deployment config
   openshift_v1_deployment_config:
     name: '{{ service_instance }}'
     namespace: '{{ namespace }}'
@@ -45,6 +81,26 @@
       service: '{{ service_instance }}'
     replicas: 1
     strategy_type: Recreate
+    strategy_recreate_params:
+      post:
+        failurePolicy: Retry
+        execNewPod:
+          containerName: '{{ service_name }}'
+          env: 
+            - name: MSSQL_SA_PASSWORD
+              valueFrom:
+              - secretKeyRef:
+                  name: '{{ service_instance }}'
+                  key: MSSQL_SA_PASSWORD
+          command:
+            - /bin/sh
+            - -i
+            - -c
+            - |
+              sqlcmd -S {{ service_instance }} -U SA -P "$MSSQL_SA_PASSWORD" -Q "IF DB_ID('{{ mssql_db }}') IS NULL
+              BEGIN
+                CREATE DATABASE {{ mssql_db }}
+              END"
     selector:
       app: '{{ service_instance }}'
       service: '{{ service_instance }}'
@@ -86,10 +142,21 @@
     volumes:
     - name: '{{ mssql_data_volume_name }}'
       emptyDir: {}
+    triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      image_change_params:
+        automatic: false
+        container_names:
+          - '{{ service_name }}'
+        _from:
+          kind: ImageStreamTag
+          name: mssql-server-linux:latest
+          namespace: '{{ namespace }}'
     state: '{{ state }}'
   when: _apb_plan_id != "persistent"
 
-- name: create persistent deployment config
+- name: Create persistent deployment config
   openshift_v1_deployment_config:
     name: '{{ service_instance }}'
     namespace: '{{ namespace }}'
@@ -98,6 +165,26 @@
       service: '{{ service_instance }}'
     replicas: 1
     strategy_type: Recreate
+    strategy_recreate_params:
+      post:
+        failurePolicy: Retry
+        execNewPod:
+          containerName: '{{ service_name }}'
+          env: 
+            - name: MSSQL_SA_PASSWORD
+              valueFrom:
+              - secretKeyRef:
+                  name: '{{ service_instance }}'
+                  key: MSSQL_SA_PASSWORD
+          command:
+            - /bin/sh
+            - -i
+            - -c
+            - |
+              sqlcmd -S {{ service_instance }} -U SA -P "$MSSQL_SA_PASSWORD" -Q "IF DB_ID('{{ mssql_db }}') IS NULL
+              BEGIN
+                CREATE DATABASE {{ mssql_db }}
+              END"
     selector:
       app: '{{ service_instance }}'
       service: '{{ service_instance }}'
@@ -140,33 +227,21 @@
     - name: '{{ mssql_data_volume_name }}'
       persistent_volume_claim:
         claim_name: '{{ service_instance }}'
+    triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      image_change_params:
+        automatic: false
+        container_names:
+          - '{{ service_name }}'
+        _from:
+          kind: ImageStreamTag
+          name: mssql-server-linux:latest
+          namespace: '{{ namespace }}'
     state: '{{ state }}'
   when: _apb_plan_id == "persistent"
 
-
-##############################################################################
-## A Kubernetes service serves as an internal load balancer.  It identifies a
-## set of replicated pods in order to proxy the connections it receives to them.
-## https://docs.openshift.org/latest/architecture/core_concepts/pods_and_services.html#services
-##############################################################################
-- name: create '{{ service_instance }}' service
-  k8s_v1_service:
-    name: '{{ service_instance }}'
-    namespace: '{{ namespace }}'
-    labels:
-      app: '{{ service_instance }}'
-      service: '{{ service_instance }}'
-    selector:
-      app: '{{ service_instance }}'
-      service: '{{ service_instance }}'
-    ports:
-      - name: '{{ service_name }}'
-        port: 1433
-        target_port: 1433
-    state: '{{ state }}'
-  register: mssql_service
-
-- name: encode bind credentials
+- name: Encode bind credentials
   asb_encode_binding:
     fields:
       DB_TYPE: "mssql"
@@ -176,22 +251,3 @@
       DB_ADMIN_PASSWORD: "{{ mssql_sa_pw }}"
       DB_NAME: "{{ mssql_db }}"
   when: action == 'provision'
-
-
-##############################################################################
-## Create a new database.
-##############################################################################
-- block:
-  - name: Wait for mssql to come up
-    wait_for:
-      port: 1433
-      host: "{{ mssql_service.service.spec.cluster_ip }}"
-      timeout: 300
-
-  - name: Create table
-    mssql_db:
-      login_host: "{{ mssql_service.service.spec.cluster_ip }}"
-      login_user: SA
-      login_password: '{{ mssql_sa_pw }}'
-      name: '{{ mssql_db }}'
-      state: '{{ state }}'
