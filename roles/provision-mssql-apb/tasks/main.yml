@@ -1,3 +1,4 @@
+---
 ##############################################################################
 ## Provision mssql-server
 ## This role executes much of the needed functionality to provision an
@@ -5,29 +6,15 @@
 ## below are some sample resources for getting started deploying an application
 ## to OpenShift.
 ##############################################################################
-- name: Encode bind credentials
-  asb_encode_binding:
-    fields:
-      DB_TYPE: "mssql"
-      DB_HOST: "{{ service_instance }}"
-      DB_PORT: "1433"
-      DB_ADMIN_USER: "SA"
-      DB_ADMIN_PASSWORD: "{{ mssql_sa_pw }}"
-      DB_NAME: "{{ mssql_db }}"
-  when: action == 'provision'
-
-- name: Process ImageStream from template
-  template:
-    src: imagestream.yaml.j2
-    dest: "/tmp/imagestream.yaml"
-  register: is
-
 - name: Create ImageStream
   openshift_v1_image_stream:
     name: mssql-server-linux
-    namespace: "{{ namespace}}"
-    state: present
-    src: "{{ is.dest | default(is.path) }}"
+    namespace: '{{ namespace}}'
+    lookup_policy_local: false
+    tags:
+      - name: '{{ mssql_image_tag }}'
+    docker_image_repository: '{{ mssql_image }}'
+    state: '{{ state }}'
 
 - name: Create PVC for persistent deployment
   k8s_v1_persistent_volume_claim:
@@ -53,16 +40,28 @@
       MSSQL_MEMORY_LIMIT_MB: '{{ (( memory_limit | int ) * 1000 ) | string }}'
     state: '{{ state }}'
 
+- name: Encode bind credentials
+  asb_encode_binding:
+    fields:
+      DB_TYPE: mssql
+      DB_HOST: '{{ service_instance }}'
+      DB_PORT: 1433
+      DB_ADMIN_USER: SA
+      DB_ADMIN_PASSWORD: '{{ mssql_sa_pw }}'
+      DB_NAME: '{{ mssql_db }}'
+  when: action == 'provision'
+
 
 ##############################################################################
 ## A Kubernetes service serves as an internal load balancer.  It identifies a
 ## set of replicated pods in order to proxy the connections it receives to them.
-## https://docs.openshift.org/latest/architecture/core_concepts/pods_and_services.html#services
 ##############################################################################
 - name: Create '{{ service_instance }}' service
   k8s_v1_service:
     name: '{{ service_instance }}'
     namespace: '{{ namespace }}'
+    annotations:
+      template.openshift.io/expose-uri: Data Source={{ service_instance }},1433; Initial Catalog={{ mssql_db }}; Integrated Security=False; User Id=SA; Password=$MSSQL_SA_PASSWORD;
     labels:
       app: '{{ service_instance }}'
       service: '{{ service_instance }}'
@@ -81,7 +80,6 @@
 ## An OpenShift Origin deployment configuration provides a replication
 ## controller, spins up pods, and also provides the ability to transition from
 ## one deployment of an image to a new one.
-## https://docs.openshift.org/latest/architecture/core_concepts/deployments.html#deployments-and-deployment-configurations
 ##############################################################################
 - name: Create ephemeral deployment config
   openshift_v1_deployment_config:
@@ -119,51 +117,51 @@
       app: '{{ service_instance }}'
       service: '{{ service_instance }}'
     containers:
-    - envFrom:
-      - secretRef:
-          name: '{{ service_instance }}'
-      image: '{{ mssql_image }}:{{ mssql_image_tag }}'
-      imagePullPolicy: '{{ mssql_image_pull }}'
-      name: '{{ service_name }}'
-      livenessProbe:
-        initialDelaySeconds: 30
-        tcpSocket:
-          port: 1433
-        timeoutSeconds: 1
-      readinessProbe:
-        exec:
-          command:
-          - /bin/sh
-          - -i
-          - -c
-          - sqlcmd -S localhost -U SA -P "$MSSQL_SA_PASSWORD" -Q "SELECT Name from sys.Databases"
-        initialDelaySeconds: 10
-        timeoutSeconds: 1
-      resources:
-        limits:
-          memory: '{{ memory_limit }}G'
-        requests:
-          memory: '{{ memory_request }}G'
-      ports:
-      - container_port: 1433
-        protocol: TCP
-      volumeMounts:
-      - name: '{{ mssql_data_volume_name }}'
-        mountPath: '{{ mssql_data_path }}'
+      - envFrom:
+          - secretRef:
+              name: '{{ service_instance }}'
+        image: '{{ mssql_image }}:{{ mssql_image_tag }}'
+        imagePullPolicy: '{{ mssql_image_pull }}'
+        name: '{{ service_name }}'
+        livenessProbe:
+          initialDelaySeconds: 30
+          tcpSocket:
+            port: 1433
+          timeoutSeconds: 1
+        readinessProbe:
+          exec:
+            command:
+              - /bin/sh
+              - -i
+              - -c
+              - sqlcmd -S localhost -U SA -P "$MSSQL_SA_PASSWORD" -Q "SELECT Name from sys.Databases"
+          initialDelaySeconds: 10
+          timeoutSeconds: 1
+        resources:
+          limits:
+            memory: '{{ memory_limit }}G'
+          requests:
+            memory: '{{ memory_request }}G'
+        ports:
+          - container_port: 1433
+            protocol: TCP
+        volumeMounts:
+          - name: '{{ mssql_data_volume_name }}'
+            mountPath: '{{ mssql_data_path }}'
     volumes:
-    - name: '{{ mssql_data_volume_name }}'
-      emptyDir: {}
+      - name: '{{ mssql_data_volume_name }}'
+        emptyDir: {}
     triggers:
-    - type: ConfigChange
-    - type: ImageChange
-      image_change_params:
-        automatic: true
-        container_names:
-          - '{{ service_name }}'
-        _from:
-          kind: ImageStreamTag
-          name: 'mssql-server-linux:{{ mssql_image_tag }}'
-          namespace: '{{ namespace }}'
+      - type: ConfigChange
+      - type: ImageChange
+        image_change_params:
+          automatic: true
+          container_names:
+            - '{{ service_name }}'
+          _from:
+            kind: ImageStreamTag
+            name: 'mssql-server-linux:{{ mssql_image_tag }}'
+            namespace: '{{ namespace }}'
     state: '{{ state }}'
   when: _apb_plan_id != "persistent"
 
@@ -203,52 +201,52 @@
       app: '{{ service_instance }}'
       service: '{{ service_instance }}'
     containers:
-    - envFrom:
-      - secretRef:
-          name: '{{ service_instance }}'
-      image: '{{ mssql_image }}:{{ mssql_image_tag }}'
-      imagePullPolicy: '{{ mssql_image_pull }}'
-      name: '{{ service_name }}'
-      livenessProbe:
-        initialDelaySeconds: 30
-        tcpSocket:
-          port: 1433
-        timeoutSeconds: 1
-      readinessProbe:
-        exec:
-          command:
-          - /bin/sh
-          - -i
-          - -c
-          - sqlcmd -S localhost -U SA -P "$MSSQL_SA_PASSWORD" -Q "SELECT Name from sys.Databases"
-        initialDelaySeconds: 10
-        timeoutSeconds: 1
-      resources:
-        limits:
-          memory: '{{ memory_limit }}G'
-        requests:
-          memory: '{{ memory_request }}G'
-      ports:
-      - container_port: 1433
-        protocol: TCP
-      volumeMounts:
-      - name: '{{ mssql_data_volume_name }}'
-        mountPath: '{{ mssql_data_path }}'
+      - envFrom:
+          - secretRef:
+              name: '{{ service_instance }}'
+        image: '{{ mssql_image }}:{{ mssql_image_tag }}'
+        imagePullPolicy: '{{ mssql_image_pull }}'
+        name: '{{ service_name }}'
+        livenessProbe:
+          initialDelaySeconds: 30
+          tcpSocket:
+            port: 1433
+          timeoutSeconds: 1
+        readinessProbe:
+          exec:
+            command:
+              - /bin/sh
+              - -i
+              - -c
+              - sqlcmd -S localhost -U SA -P "$MSSQL_SA_PASSWORD" -Q "SELECT Name from sys.Databases"
+          initialDelaySeconds: 10
+          timeoutSeconds: 1
+        resources:
+          limits:
+            memory: '{{ memory_limit }}G'
+          requests:
+            memory: '{{ memory_request }}G'
+        ports:
+          - container_port: 1433
+            protocol: TCP
+        volumeMounts:
+          - name: '{{ mssql_data_volume_name }}'
+            mountPath: '{{ mssql_data_path }}'
     volumes:
-    - name: '{{ mssql_data_volume_name }}'
-      persistent_volume_claim:
-        claim_name: '{{ service_instance }}'
+      - name: '{{ mssql_data_volume_name }}'
+        persistent_volume_claim:
+          claim_name: '{{ service_instance }}'
     triggers:
-    - type: ConfigChange
-    - type: ImageChange
-      image_change_params:
-        automatic: true
-        container_names:
-          - '{{ service_name }}'
-        _from:
-          kind: ImageStreamTag
-          name: 'mssql-server-linux:{{ mssql_image_tag }}'
-          namespace: '{{ namespace }}'
+      - type: ConfigChange
+      - type: ImageChange
+        image_change_params:
+          automatic: true
+          container_names:
+            - '{{ service_name }}'
+          _from:
+            kind: ImageStreamTag
+            name: 'mssql-server-linux:{{ mssql_image_tag }}'
+            namespace: '{{ namespace }}'
     state: '{{ state }}'
   when: _apb_plan_id == "persistent"
 
@@ -257,16 +255,16 @@
 ## Create a new database.
 ##############################################################################
 - block:
-  - name: Wait for mssql to come up
-    wait_for:
-      port: 1433
-      host: "{{ mssql_service.service.spec.cluster_ip }}"
-      timeout: 300
+    - name: Wait for mssql to come up
+      wait_for:
+        port: 1433
+        host: "{{ mssql_service.service.spec.cluster_ip }}"
+        timeout: 300
 
-  - name: Create table
-    mssql_db:
-      login_host: "{{ mssql_service.service.spec.cluster_ip }}"
-      login_user: SA
-      login_password: '{{ mssql_sa_pw }}'
-      name: '{{ mssql_db }}'
-      state: '{{ state }}'
+    - name: Create table
+      mssql_db:
+        login_host: "{{ mssql_service.service.spec.cluster_ip }}"
+        login_user: SA
+        login_password: '{{ mssql_sa_pw }}'
+        name: '{{ mssql_db }}'
+        state: '{{ state }}'
