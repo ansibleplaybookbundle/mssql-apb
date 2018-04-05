@@ -82,12 +82,6 @@ plans:
         required: true
         default: IfNotPresent
         display_group: MS SQL Config
-      - name: MSSQL_SCHEDULED
-        title: "ImageStream ImportPolicy Scheduled"
-        type: boolean
-        required: true
-        default: true
-        display_group: MS SQL Config
       - name: MSSQL_MEMORY_LIMIT
         required: true
         default: 3
@@ -169,12 +163,6 @@ plans:
         enum: ['Always', 'IfNotPresent', 'Never']
         required: true
         default: IfNotPresent
-        display_group: MS SQL Config
-      - name: MSSQL_SCHEDULED
-        title: "ImageStream ImportPolicy Scheduled"
-        type: boolean
-        required: true
-        default: true
         display_group: MS SQL Config
       - name: MSSQL_DATA_STORAGE_SIZE
         required: true

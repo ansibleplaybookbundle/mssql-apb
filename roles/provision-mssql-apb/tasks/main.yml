@@ -90,26 +90,6 @@
       service: '{{ service_instance }}'
     replicas: 1
     strategy_type: Recreate
-    strategy_recreate_params:
-      post:
-        failurePolicy: Ignore
-        execNewPod:
-          containerName: '{{ service_name }}'
-          env:
-            - name: MSSQL_SA_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: '{{ service_instance }}'
-                  key: MSSQL_SA_PASSWORD
-          command:
-            - uid_entrypoint
-            - /bin/sh
-            - -c
-            - |
-              sqlcmd -S {{ service_instance }} -U SA -P "$MSSQL_SA_PASSWORD" -Q "IF DB_ID('{{ mssql_db }}') IS NULL
-              BEGIN
-                CREATE DATABASE {{ mssql_db }}
-              END"
     selector:
       app: '{{ service_instance }}'
       service: '{{ service_instance }}'
@@ -174,26 +154,6 @@
       service: '{{ service_instance }}'
     replicas: 1
     strategy_type: Recreate
-    strategy_recreate_params:
-      post:
-        failurePolicy: Ignore
-        execNewPod:
-          containerName: '{{ service_name }}'
-          env:
-            - name: MSSQL_SA_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: '{{ service_instance }}'
-                  key: MSSQL_SA_PASSWORD
-          command:
-            - uid_entrypoint
-            - /bin/sh
-            - -c
-            - |
-              sqlcmd -S {{ service_instance }} -U SA -P "$MSSQL_SA_PASSWORD" -Q "IF DB_ID('{{ mssql_db }}') IS NULL
-              BEGIN
-                CREATE DATABASE {{ mssql_db }}
-              END"
     selector:
       app: '{{ service_instance }}'
       service: '{{ service_instance }}'
