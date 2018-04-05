@@ -55,7 +55,7 @@ plans:
       - name: MSSQL_PID
         required: true
         type: enum
-        enum: ['Evaluation', 'Developer', 'Express']
+        enum: ['Developer', 'Evaluation']
         default: Developer
         title: Set the SQL Server edition.
         display_group: MS SQL Config
@@ -143,7 +143,7 @@ plans:
       - name: MSSQL_PID
         required: true
         type: enum
-        enum: ['Evaluation', 'Developer', 'Express']
+        enum: ['Developer', 'Evaluation']
         default: Developer
         title: Set the SQL Server edition.
         display_group: MS SQL Config

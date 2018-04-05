@@ -1,3 +1,4 @@
+---
 ##############################################################################
 ## Deprovision mssql-server
 ## This role executes much of the needed functionality to deprovision an
@@ -21,7 +22,7 @@
 ## its associated resources like replication controllers and pods
 ##############################################################################
 - openshift_v1_deployment_config:
-    name: '{{ service_instance }}' 
+    name: '{{ service_instance }}'
     namespace: '{{ namespace }}'
     state: '{{ state }}'
 
