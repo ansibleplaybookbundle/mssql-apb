@@ -10,7 +10,6 @@
   openshift_v1_image_stream:
     name: mssql-server-linux
     namespace: '{{ namespace}}'
-    lookup_policy_local: true
     tags:
       - name: '{{ mssql_image_tag }}'
     docker_image_repository: '{{ mssql_image }}'
@@ -99,7 +98,7 @@
       - envFrom:
           - secretRef:
               name: '{{ service_instance }}'
-        image: 'mssql-server-linux:{{ mssql_image_tag }}'
+        image: ""
         imagePullPolicy: '{{ mssql_image_pull }}'
         name: '{{ service_name }}'
         livenessProbe:
@@ -132,6 +131,15 @@
         emptyDir: {}
     triggers:
       - type: ConfigChange
+      - type: ImageChange
+        image_change_params:
+          automatic: true
+          container_names:
+            - '{{ service_name }}'
+          _from:
+            kind: ImageStreamTag
+            name: 'mssql-server-linux:{{ mssql_image_tag }}'
+            namespace: '{{ namespace }}'
     state: '{{ state }}'
   when: _apb_plan_id != "persistent"
 
@@ -154,7 +162,7 @@
       - envFrom:
           - secretRef:
               name: '{{ service_instance }}'
-        image: 'mssql-server-linux:{{ mssql_image_tag }}'
+        image: ""
         imagePullPolicy: '{{ mssql_image_pull }}'
         name: '{{ service_name }}'
         livenessProbe:
@@ -188,6 +196,15 @@
           claim_name: '{{ service_instance }}'
     triggers:
       - type: ConfigChange
+      - type: ImageChange
+        image_change_params:
+          automatic: true
+          container_names:
+            - '{{ service_name }}'
+          _from:
+            kind: ImageStreamTag
+            name: 'mssql-server-linux:{{ mssql_image_tag }}'
+            namespace: '{{ namespace }}'
     state: '{{ state }}'
   when: _apb_plan_id == "persistent"
 
@@ -201,7 +218,6 @@
         port: 1433
         host: '{{ mssql_service.service.spec.cluster_ip }}'
         timeout: 360
-      when: action == 'provision'
 
     - name: Create table
       mssql_db:
@@ -210,4 +226,3 @@
         login_password: '{{ mssql_sa_pw }}'
         name: '{{ mssql_db }}'
         state: '{{ state }}'
-      when: action == 'provision'
