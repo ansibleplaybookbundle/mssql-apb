@@ -66,6 +66,13 @@ plans:
         default: false
         description: By default, agent is disabled.
         display_group: MS SQL Config
+      - name: MSSQL_LOCAL_IS
+        title: Use existing mssql-server-linux imagestream in project.
+        type: boolean
+        required: true
+        default: false
+        description: By default, agent is disabled.
+        display_group: MS SQL Config
       - name: MSSQL_LCID
         title: Set the language ID.
         type: integer
@@ -143,6 +150,13 @@ plans:
         display_group: MS SQL Config
       - name: MSSQL_AGENT_ENABLED
         title: Enable SQL Server Agent.
+        type: boolean
+        required: true
+        default: false
+        description: By default, agent is disabled.
+        display_group: MS SQL Config
+      - name: MSSQL_LOCAL_IS
+        title: Use existing mssql-server-linux imagestream in project.
         type: boolean
         required: true
         default: false

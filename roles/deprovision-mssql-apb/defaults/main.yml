@@ -1,4 +1,5 @@
 ---
 service_name: "mssql"
-service_instance: "{{ service_name }}-{{ _apb_service_instance_id }}"
+service_instance: "{{ service_name }}-server"
+#service_instance: "{{ service_name }}-{{ _apb_service_instance_id }}"
 state: "absent"
