@@ -11,5 +11,5 @@
   - role: deprovision-mssql-apb
   vars:
     action: test
-    _apb_service_instance_id: 15c0e133-2a28-4795-a428-638a28c36072
     _apb_plan_id: persistent
+    #_apb_service_instance_id: 15c0e133-2a28-4795-a428-638a28c36072

@@ -1,11 +1,14 @@
 ---
 service_name: "mssql"
-service_instance: "{{ service_name }}-{{ _apb_service_instance_id }}"
+service_instance: "{{ service_name }}-server"
+service_port: 1433
+#service_instance: "{{ service_name }}-{{ _apb_service_instance_id }}"
 state: "present"
 
 mssql_image: "docker.io/tchughesiv/mssql-server-linux"
 mssql_image_tag: "{{ MSSQL_IMAGE_TAG | default('latest') }}"
 mssql_image_pull: "{{ MSSQL_IMAGE_PULL | default('IfNotPresent') }}"
+mssql_local: "{{ MSSQL_LOCAL_IS | default('false') }}"
 
 mssql_pid: "{{ MSSQL_PID | default('Developer') }}"
 mssql_lcid: "{{ MSSQL_LCID | default('1033') }}"

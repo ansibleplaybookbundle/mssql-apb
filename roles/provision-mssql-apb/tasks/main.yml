@@ -9,11 +9,12 @@
 - name: Create ImageStream
   openshift_v1_image_stream:
     name: mssql-server-linux
-    namespace: '{{ namespace}}'
+    namespace: '{{ namespace }}'
     tags:
       - name: '{{ mssql_image_tag }}'
     docker_image_repository: '{{ mssql_image }}'
     state: '{{ state }}'
+  when: mssql_local != true
 
 - name: Create PVC for persistent deployment
   k8s_v1_persistent_volume_claim:
@@ -39,18 +40,6 @@
       MSSQL_MEMORY_LIMIT_MB: '{{ (( memory_limit | int ) * 1000 ) | string }}'
     state: '{{ state }}'
 
-- name: Encode bind credentials
-  asb_encode_binding:
-    fields:
-      DB_TYPE: mssql
-      DB_HOST: '{{ service_instance }}'
-      DB_PORT: 1433
-      DB_ADMIN_USER: SA
-      DB_ADMIN_PASSWORD: '{{ mssql_sa_pw }}'
-      DB_NAME: '{{ mssql_db }}'
-      DB_URI: 'Data Source={{ service_instance }},1433; Initial Catalog={{ mssql_db }}; Integrated Security=False; User Id=SA; Password={{ mssql_sa_pw }};'
-  when: action == 'provision'
-
 
 ##############################################################################
 ## A Kubernetes service serves as an internal load balancer.  It identifies a
@@ -68,10 +57,22 @@
       service: '{{ service_instance }}'
     ports:
       - name: '{{ service_name }}'
-        port: 1433
+        port: '{{ service_port }}'
         target_port: 1433
     state: '{{ state }}'
   register: mssql_service
+
+- name: Encode bind credentials
+  asb_encode_binding:
+    fields:
+      DB_TYPE: mssql
+      DB_HOST: '{{ service_instance }}.{{ namespace }}.svc'
+      DB_PORT: '{{ service_port }}'
+      DB_ADMIN_USER: SA
+      DB_ADMIN_PASSWORD: '{{ mssql_sa_pw }}'
+      DB_NAME: '{{ mssql_db }}'
+      DB_URI: 'Data Source={{ service_instance }}.{{ namespace }}.svc,{{ service_port }}; Initial Catalog={{ mssql_db }}; Integrated Security=False; User Id=SA; Password={{ mssql_sa_pw }};'
+  when: action == 'provision'
 
 
 ##############################################################################
@@ -215,13 +216,14 @@
 - block:
     - name: Wait for mssql to come up
       wait_for:
-        port: 1433
-        host: '{{ mssql_service.service.spec.cluster_ip }}'
+        host: '{{ service_instance }}.{{ namespace }}.svc'
+        port: '{{ service_port }}'
         timeout: 360
 
     - name: Create table
       mssql_db:
-        login_host: '{{ mssql_service.service.spec.cluster_ip }}'
+        login_host: '{{ service_instance }}.{{ namespace }}.svc'
+        login_port: '{{ service_port }}'
         login_user: SA
         login_password: '{{ mssql_sa_pw }}'
         name: '{{ mssql_db }}'
