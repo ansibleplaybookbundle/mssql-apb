@@ -25,6 +25,13 @@ plans:
         This plan will deploy a standalone MS SQL Server on Linux
         using ephemeral storage
     parameters:
+      - name: MSSQL_PID
+        required: true
+        type: enum
+        enum: ['Developer', 'Evaluation']
+        default: Developer
+        title: Set the SQL Server edition.
+        display_group: MS SQL Config
       - name: MSSQL_PASSWORD
         required: true
         default: "Hello123!"
@@ -45,20 +52,6 @@ plans:
         display_group: MS SQL Config
         min_length: 8
         max_length: 128
-      - name: MSSQL_DATABASE
-        required: true
-        default: TestDB
-        pattern: "^[a-zA-Z0-9_-]*$"
-        type: string
-        title: Name of the MS SQL database to create.
-        display_group: MS SQL Config
-      - name: MSSQL_PID
-        required: true
-        type: enum
-        enum: ['Developer', 'Evaluation']
-        default: Developer
-        title: Set the SQL Server edition.
-        display_group: MS SQL Config
       - name: MSSQL_AGENT_ENABLED
         title: Enable SQL Server Agent.
         type: boolean
@@ -113,6 +106,13 @@ plans:
         This plan will deploy a standalone MS SQL Server on Linux
         using persistent storage
     parameters:
+      - name: MSSQL_PID
+        required: true
+        type: enum
+        enum: ['Developer', 'Evaluation']
+        default: Developer
+        title: Set the SQL Server edition.
+        display_group: MS SQL Config
       - name: MSSQL_PASSWORD
         required: true
         default: "Hello123!"
@@ -133,20 +133,6 @@ plans:
         display_group: MS SQL Config
         min_length: 8
         max_length: 128
-      - name: MSSQL_DATABASE
-        required: true
-        default: TestDB
-        pattern: "^[a-zA-Z0-9_-]*$"
-        type: string
-        title: Name of the MS SQL database to create.
-        display_group: MS SQL Config
-      - name: MSSQL_PID
-        required: true
-        type: enum
-        enum: ['Developer', 'Evaluation']
-        default: Developer
-        title: Set the SQL Server edition.
-        display_group: MS SQL Config
       - name: MSSQL_AGENT_ENABLED
         title: Enable SQL Server Agent.
         type: boolean
