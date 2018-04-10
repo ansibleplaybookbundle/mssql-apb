@@ -62,6 +62,22 @@
     state: '{{ state }}'
   register: mssql_service
 
+- name: Create '{{ service_short }}' service
+  k8s_v1_service:
+    name: '{{ service_short }}'
+    namespace: '{{ namespace }}'
+    labels:
+      app: '{{ service_instance }}'
+      service: '{{ service_instance }}'
+    selector:
+      app: '{{ service_instance }}'
+      service: '{{ service_instance }}'
+    ports:
+      - name: '{{ service_name }}'
+        port: '{{ service_port }}'
+        target_port: 1433
+    state: '{{ state }}'
+
 - name: Encode bind credentials
   asb_encode_binding:
     fields:

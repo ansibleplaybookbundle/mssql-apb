@@ -1,8 +1,8 @@
 ---
 service_name: "mssql"
-service_instance: "{{ service_name }}-server"
+service_instance: "{{ service_name }}-{{ _apb_service_instance_id }}"
+service_short: "{{ service_name }}-server"
 service_port: 1433
-#service_instance: "{{ service_name }}-{{ _apb_service_instance_id }}"
 state: "present"
 
 mssql_image: "docker.io/tchughesiv/mssql-server-linux"
