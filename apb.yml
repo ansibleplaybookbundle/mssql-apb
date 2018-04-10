@@ -71,7 +71,6 @@ plans:
         type: boolean
         required: true
         default: false
-        description: By default, agent is disabled.
         display_group: MS SQL Config
       - name: MSSQL_LCID
         title: Set the language ID.
@@ -160,7 +159,6 @@ plans:
         type: boolean
         required: true
         default: false
-        description: By default, agent is disabled.
         display_group: MS SQL Config
       - name: MSSQL_LCID
         title: Set the language ID.
