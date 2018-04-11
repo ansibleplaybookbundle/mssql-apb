@@ -14,14 +14,47 @@
       - name: '{{ mssql_image_tag }}'
     docker_image_repository: '{{ mssql_image }}'
     state: '{{ state }}'
+  async: 180
+  poll: 0
+  register: create_is
   when: mssql_local != true
+
+- name: Create secret
+  k8s_v1_secret:
+    name: '{{ service_instance }}'
+    namespace: '{{ namespace }}'
+    string_data:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: '{{ mssql_sa_pw }}'
+      MSSQL_PID: '{{ mssql_pid }}'
+      MSSQL_LCID: '{{ mssql_lcid | string }}'
+      MSSQL_AGENT_ENABLED: '{{ mssql_agent | string }}'
+      MSSQL_MEMORY_LIMIT_MB: '{{ (( memory_limit | int ) * 1000 ) | string }}'
+    state: '{{ state }}'
+  async: 180
+  poll: 0
+  register: create_secret
+
+- name: Create PVC for persistent deployment
+  k8s_v1_persistent_volume_claim:
+    name: '{{ service_instance }}'
+    namespace: '{{ namespace }}'
+    access_modes:
+      - ReadWriteOnce
+    resources_requests:
+      storage: '{{ volume_size }}G'
+    state: '{{ state }}'
+  async: 180
+  poll: 0
+  register: create_pvc
+  when: _apb_plan_id == "persistent"
 
 
 ##############################################################################
 ## A Kubernetes service serves as an internal load balancer.  It identifies a
 ## set of replicated pods in order to proxy the connections it receives to them.
 ##############################################################################
-- name: Create '{{ service_instance }}' service
+- name: Create service
   k8s_v1_service:
     name: '{{ service_instance }}'
     namespace: '{{ namespace }}'
@@ -37,7 +70,7 @@
         target_port: 1433
     state: '{{ state }}'
 
-- name: Create '{{ service_name }}' service
+- name: Create '{{ service_name }}' CNAME service
   k8s_v1_service:
     name: '{{ service_name }}'
     namespace: '{{ namespace }}'
@@ -54,6 +87,9 @@
         port: '{{ service_port }}'
         target_port: 1433
     state: '{{ state }}'
+  async: 180
+  poll: 0
+  register: create_svc_cname
 
 
 ##############################################################################
@@ -198,30 +234,6 @@
     state: '{{ state }}'
   when: _apb_plan_id == "persistent"
 
-- name: Create secret
-  k8s_v1_secret:
-    name: '{{ service_instance }}'
-    namespace: '{{ namespace }}'
-    string_data:
-      ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: '{{ mssql_sa_pw }}'
-      MSSQL_PID: '{{ mssql_pid }}'
-      MSSQL_LCID: '{{ mssql_lcid | string }}'
-      MSSQL_AGENT_ENABLED: '{{ mssql_agent | string }}'
-      MSSQL_MEMORY_LIMIT_MB: '{{ (( memory_limit | int ) * 1000 ) | string }}'
-    state: '{{ state }}'
-
-- name: Create PVC for persistent deployment
-  k8s_v1_persistent_volume_claim:
-    name: '{{ service_instance }}'
-    namespace: '{{ namespace }}'
-    access_modes:
-      - ReadWriteOnce
-    resources_requests:
-      storage: '{{ volume_size }}G'
-    state: '{{ state }}'
-  when: _apb_plan_id == "persistent"
-
 
 ##############################################################################
 ## Encode bind credentials.
@@ -237,6 +249,32 @@
       DB_NAME: '{{ mssql_db }}'
       DB_URI: 'Data Source={{ service_instance }}.{{ namespace }}.svc,{{ service_port }}; Initial Catalog={{ mssql_db }}; User Id=SA; Password={{ mssql_sa_pw }};'
   when: action == 'provision'
+
+- name: 'Check on ImageStream task'
+  async_status: jid={{ create_is.ansible_job_id }}
+  register: is_job_result
+  until: is_job_result.finished
+  retries: 60
+  when: mssql_local != true
+
+- name: 'Check on secret task'
+  async_status: jid={{ create_secret.ansible_job_id }}
+  register: s_job_result
+  until: s_job_result.finished
+  retries: 60
+
+- name: 'Check on PVC task'
+  async_status: jid={{ create_pvc.ansible_job_id }}
+  register: pvc_job_result
+  until: pvc_job_result.finished
+  retries: 60
+  when: _apb_plan_id == "persistent"
+
+- name: 'Check on service CNAME task'
+  async_status: jid={{ create_svc_cname.ansible_job_id }}
+  register: csvc_job_result
+  until: csvc_job_result.finished
+  retries: 60
 
 - name: Wait for mssql to come up
   wait_for:
