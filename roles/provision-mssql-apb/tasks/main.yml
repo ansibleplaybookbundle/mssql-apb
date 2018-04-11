@@ -95,9 +95,9 @@
               - -i
               - -c
               - |
-                sqlcmd -S localhost -U SA -P "$MSSQL_SA_PASSWORD" -Q "IF DB_ID('{{ mssql_db }}') IS NULL		
-                BEGIN		
-                  CREATE DATABASE {{ mssql_db }}		
+                sqlcmd -S localhost -U SA -P "$MSSQL_SA_PASSWORD" -Q "IF DB_ID('{{ mssql_db }}') IS NULL
+                BEGIN
+                  CREATE DATABASE {{ mssql_db }}
                 END"
           initialDelaySeconds: 10
           timeoutSeconds: 1
@@ -163,9 +163,9 @@
               - -i
               - -c
               - |
-                sqlcmd -S localhost -U SA -P "$MSSQL_SA_PASSWORD" -Q "IF DB_ID('{{ mssql_db }}') IS NULL		
-                BEGIN		
-                  CREATE DATABASE {{ mssql_db }}		
+                sqlcmd -S localhost -U SA -P "$MSSQL_SA_PASSWORD" -Q "IF DB_ID('{{ mssql_db }}') IS NULL
+                BEGIN
+                  CREATE DATABASE {{ mssql_db }}
                 END"
           initialDelaySeconds: 10
           timeoutSeconds: 1
@@ -238,9 +238,9 @@
       DB_URI: 'Data Source={{ service_instance }}.{{ namespace }}.svc,{{ service_port }}; Initial Catalog={{ mssql_db }}; User Id=SA; Password={{ mssql_sa_pw }};'
   when: action == 'provision'
 
-- name: Wait for mssql to come up		
-  wait_for:		
-    host: '{{ service_instance }}.{{ namespace }}.svc'		
-    port: '{{ service_port }}'		
+- name: Wait for mssql to come up
+  wait_for:
+    host: '{{ service_instance }}.{{ namespace }}.svc'
+    port: '{{ service_port }}'
     timeout: 360
   when: action == 'test'
