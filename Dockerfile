@@ -131,3 +131,5 @@ COPY roles /opt/ansible/roles
 RUN chown -R apb:0 /opt/{ansible,apb} && \
     chmod -R g=u /opt/{ansible,apb}
 USER apb
+ENV ANSIBLE_PIPELINING=True \
+    ANSIBLE_CALLBACK_WHITELIST=profile_tasks

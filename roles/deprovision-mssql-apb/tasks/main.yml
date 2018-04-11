@@ -14,6 +14,9 @@
     name: '{{ service_instance }}'
     namespace: '{{ namespace }}'
     state: '{{ state }}'
+  async: 180
+  poll: 0
+  register: rm_svc
 
 
 ##############################################################################
@@ -25,6 +28,9 @@
     name: '{{ service_instance }}'
     namespace: '{{ namespace }}'
     state: '{{ state }}'
+  async: 180
+  poll: 0
+  register: rm_dc
 
 
 ##############################################################################
@@ -34,3 +40,25 @@
     name: '{{ service_instance }}'
     namespace: '{{ namespace }}'
     state: '{{ state }}'
+  async: 180
+  poll: 0
+  register: rm_secret
+
+
+- name: 'Check on service task'
+  async_status: jid={{ rm_svc.ansible_job_id }}
+  register: svc_job_result
+  until: svc_job_result.finished
+  retries: 60
+
+- name: 'Check on DC task'
+  async_status: jid={{ rm_dc.ansible_job_id }}
+  register: dc_job_result
+  until: dc_job_result.finished
+  retries: 60
+
+- name: 'Check on secret task'
+  async_status: jid={{ rm_secret.ansible_job_id }}
+  register: s_job_result
+  until: s_job_result.finished
+  retries: 60

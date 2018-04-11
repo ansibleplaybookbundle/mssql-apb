@@ -1,7 +1,7 @@
 ---
 - name: mssql-apb playbook to provision the application
   hosts: localhost
-  gather_facts: false
+  gather_facts: False
   connection: local
   roles:
   - role: ansible.kubernetes-modules
