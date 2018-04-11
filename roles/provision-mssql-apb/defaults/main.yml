@@ -16,6 +16,7 @@ mssql_agent: "{{ MSSQL_AGENT_ENABLED | default('false') }}"
 mssql_data_volume_name: "{{ service_name }}-data"
 mssql_data_path: "/var/opt/mssql/data"
 
+mssql_db: "{{ MSSQL_DATABASE | default('TestDB') }}"
 mssql_sa_pw: "{{ MSSQL_PASSWORD | default('Hello123!') }}"
 
 volume_size: "{{ MSSQL_DATA_STORAGE_SIZE | default('1') }}"
