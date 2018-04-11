@@ -128,11 +128,6 @@ ICAgIGRpc3BsYXlfZ3JvdXA6IEVudmlyb25tZW50IFNpemluZwo="
 
 COPY playbooks /opt/apb/actions
 COPY roles /opt/ansible/roles
-RUN yum -y install --setopt=tsflags=nodocs python-pip && \
-    yum clean all && \
-    chown -R 0 /opt/{ansible,apb} && \
-    pip install --upgrade pip && \
-    pip install pymssql && \
-    chown -R apb:0 /opt/{ansible,apb} && \
+RUN chown -R apb:0 /opt/{ansible,apb} && \
     chmod -R g=u /opt/{ansible,apb}
 USER apb
