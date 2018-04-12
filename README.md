@@ -1,4 +1,4 @@
-# MS SQL Server on Linux APB
+# Microsoft SQL Server on Linux APB
 
 [![Build Status](https://travis-ci.org/ansibleplaybookbundle/mssql-apb.svg?branch=master)](https://travis-ci.org/ansibleplaybookbundle/mssql-apb)
 
@@ -6,7 +6,7 @@
 
 ![img](docs/img/sql-server.png)
 
-Deploy Microsoft SQL Server on Linux 2017 into your Openshift project via APB
+Deploy Microsoft SQL Server on Linux into your Openshift project via APB
 
 ## Plans
 

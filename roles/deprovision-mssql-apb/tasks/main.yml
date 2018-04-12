@@ -49,16 +49,16 @@
   async_status: jid={{ rm_svc.ansible_job_id }}
   register: svc_job_result
   until: svc_job_result.finished
-  retries: 60
+  retries: 120
 
 - name: 'Check on DC task'
   async_status: jid={{ rm_dc.ansible_job_id }}
   register: dc_job_result
   until: dc_job_result.finished
-  retries: 60
+  retries: 120
 
 - name: 'Check on secret task'
   async_status: jid={{ rm_secret.ansible_job_id }}
   register: s_job_result
   until: s_job_result.finished
-  retries: 60
+  retries: 120
