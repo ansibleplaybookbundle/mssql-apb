@@ -24,7 +24,7 @@
     name: '{{ service_instance }}'
     namespace: '{{ namespace }}'
     string_data:
-      ACCEPT_EULA: "Y"
+      ACCEPT_EULA: "{{ lookup('template', 'eula.j2') }}"
       MSSQL_SA_PASSWORD: '{{ mssql_sa_pw }}'
       MSSQL_PID: '{{ mssql_pid }}'
       MSSQL_LCID: '{{ mssql_lcid | string }}'
@@ -87,9 +87,6 @@
         port: '{{ service_port }}'
         target_port: 1433
     state: '{{ state }}'
-  async: 180
-  poll: 0
-  register: create_svc_cname
 
 
 ##############################################################################
@@ -254,27 +251,21 @@
   async_status: jid={{ create_is.ansible_job_id }}
   register: is_job_result
   until: is_job_result.finished
-  retries: 60
+  retries: 120
   when: mssql_local != true
 
 - name: 'Check on secret task'
   async_status: jid={{ create_secret.ansible_job_id }}
   register: s_job_result
   until: s_job_result.finished
-  retries: 60
+  retries: 120
 
 - name: 'Check on PVC task'
   async_status: jid={{ create_pvc.ansible_job_id }}
   register: pvc_job_result
   until: pvc_job_result.finished
-  retries: 60
+  retries: 120
   when: _apb_plan_id == "persistent"
-
-- name: 'Check on service CNAME task'
-  async_status: jid={{ create_svc_cname.ansible_job_id }}
-  register: csvc_job_result
-  until: csvc_job_result.finished
-  retries: 60
 
 - name: Wait for mssql to come up
   wait_for:
