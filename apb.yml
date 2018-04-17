@@ -10,13 +10,13 @@ metadata:
     https://raw.githubusercontent.com/ansibleplaybookbundle/mssql-apb/master/docs/img/sql-server.png
   documentationUrl:
     https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-overview
-  dependencies: ['docker.io/tchughesiv/mssql-server-linux']
+  dependencies: ['registry.centos.org/microsoft/mssql-server-linux']
 tags:
   - database
   - mssql
 plans:
   - name: ephemeral
-    description: This plan deploys an ephemeral Microsoft SQL Server on Linux.
+    description: This plan deploys an ephemeral Microsoft SQL Server on Linux
     free: true
     default: true
     metadata:
@@ -26,7 +26,7 @@ plans:
         using ephemeral storage
     parameters:
       - name: ACCEPT_EULA
-        title: Accept the End-User Licensing Agreement.
+        title: Accept the End-User Licensing Agreement
         type: boolean
         required: true
         default: false
@@ -44,11 +44,11 @@ plans:
           |(?:\\W+.*([A-Z]|[a-z])+.*\\d+.*)|(?:\\d+.*([A-Z]|[a-z])+.*\\W+.*))$"
         type: string
         display_type: password
-        title: "Password for the database admin (SA) user."
+        title: "Database Admin (SA) Password"
         description:
           "The password must be at least 8 characters long and contain
           characters from three of the following four sets: Uppercase
-          letters, Lowercase letters, Base 10 digits, and Symbols."
+          letters, Lowercase letters, Base 10 digits, and Symbols"
         display_group: Microsoft SQL Config
         min_length: 8
         max_length: 128
@@ -57,10 +57,10 @@ plans:
         default: TestDB
         pattern: "^[a-zA-Z0-9_-]*$"
         type: string
-        title: Name of the Microsoft SQL database to create.
+        title: Microsoft SQL Database Name
         display_group: Microsoft SQL Config
       - name: MSSQL_AGENT_ENABLED
-        title: Enable SQL Server Agent.
+        title: Enable SQL Server Agent
         type: boolean
         required: true
         default: false
@@ -70,20 +70,20 @@ plans:
         type: enum
         enum: ['Developer', 'Evaluation']
         default: Developer
-        title: Set the SQL Server edition.
+        title: SQL Server Edition
         display_group: Microsoft SQL Config
       - name: MSSQL_LOCAL_IS
-        title: Use existing mssql-server-linux imagestream in project.
+        title: Use existing mssql-server-linux imagestream in project
         type: boolean
         required: true
         default: false
         display_group: Microsoft SQL Config
       - name: MSSQL_LCID
-        title: Set the language ID.
+        title: Language ID
         type: integer
         required: true
         default: 1033
-        description: For example - 1033 is English (US), 1036 is French.
+        description: e.g., 1033 is English (US), 1036 is French
         min_length: 4
         max_length: 4
         display_group: Microsoft SQL Config
@@ -111,7 +111,7 @@ plans:
         display_group: Environment Sizing
 
   - name: persistent
-    description: This plan deploys a persistent Microsoft SQL Server on Linux.
+    description: This plan deploys a persistent Microsoft SQL Server on Linux
     free: true
     metadata:
       displayName: Persistent installation
@@ -120,7 +120,7 @@ plans:
         using persistent storage
     parameters:
       - name: ACCEPT_EULA
-        title: Accept the End-User Licensing Agreement.
+        title: Accept the End-User Licensing Agreement
         type: boolean
         required: true
         default: false
@@ -138,11 +138,11 @@ plans:
           |(?:\\W+.*([A-Z]|[a-z])+.*\\d+.*)|(?:\\d+.*([A-Z]|[a-z])+.*\\W+.*))$"
         type: string
         display_type: password
-        title: "Password for the database admin (SA) user."
+        title: "Database Admin (SA) Password"
         description:
           "The password must be at least 8 characters long and contain
           characters from three of the following four sets: Uppercase
-          letters, Lowercase letters, Base 10 digits, and Symbols."
+          letters, Lowercase letters, Base 10 digits, and Symbols"
         display_group: Microsoft SQL Config
         min_length: 8
         max_length: 128
@@ -151,10 +151,10 @@ plans:
         default: TestDB
         pattern: "^[a-zA-Z0-9_-]*$"
         type: string
-        title: Name of the Microsoft SQL database to create.
+        title: Microsoft SQL Database Name
         display_group: Microsoft SQL Config
       - name: MSSQL_AGENT_ENABLED
-        title: Enable SQL Server Agent.
+        title: Enable SQL Server Agent
         type: boolean
         required: true
         default: false
@@ -164,20 +164,20 @@ plans:
         type: enum
         enum: ['Developer', 'Evaluation']
         default: Developer
-        title: Set the SQL Server edition.
+        title: SQL Server Edition
         display_group: Microsoft SQL Config
       - name: MSSQL_LOCAL_IS
-        title: Use existing mssql-server-linux imagestream in project.
+        title: Use existing mssql-server-linux imagestream in project
         type: boolean
         required: true
         default: false
         display_group: Microsoft SQL Config
       - name: MSSQL_LCID
-        title: Set the language ID.
+        title: Language ID
         type: integer
         required: true
         default: 1033
-        description: For example - 1033 is English (US), 1036 is French.
+        description: e.g., 1033 is English (US), 1036 is French
         min_length: 4
         max_length: 4
         display_group: Microsoft SQL Config
