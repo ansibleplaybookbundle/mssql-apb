@@ -70,24 +70,6 @@
         target_port: 1433
     state: '{{ state }}'
 
-- name: Create '{{ service_name }}' CNAME service
-  k8s_v1_service:
-    name: '{{ service_name }}'
-    namespace: '{{ namespace }}'
-    type: ExternalName
-    external_name: '{{ service_instance }}.{{ namespace }}.svc.cluster.local'
-    labels:
-      app: '{{ service_instance }}'
-      service: '{{ service_instance }}'
-    selector:
-      app: '{{ service_instance }}'
-      service: '{{ service_instance }}'
-    ports:
-      - name: '{{ service_name }}'
-        port: '{{ service_port }}'
-        target_port: 1433
-    state: '{{ state }}'
-
 
 ##############################################################################
 ## An OpenShift Origin deployment configuration provides a replication
