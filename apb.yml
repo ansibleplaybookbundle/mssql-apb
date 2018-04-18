@@ -6,11 +6,9 @@ bindable: true
 async: optional
 metadata:
   displayName: Microsoft SQL Server on Linux
-  imageUrl:
-    https://raw.githubusercontent.com/ansibleplaybookbundle/mssql-apb/master/docs/img/sql-server.png
+  console.openshift.io/iconClass: icon-mssql
   documentationUrl:
     https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-overview
-  dependencies: ['registry.centos.org/microsoft/mssql-server-linux']
 tags:
   - database
   - mssql
