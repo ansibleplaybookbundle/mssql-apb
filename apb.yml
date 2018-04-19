@@ -86,7 +86,7 @@ plans:
         max_length: 4
         display_group: Microsoft SQL Config
       - name: MSSQL_IMAGE_PULL
-        title: "DeploymentConfig Image pull policy"
+        title: "DeploymentConfig Image Pull Policy"
         type: enum
         enum: ['Always', 'IfNotPresent', 'Never']
         required: true
@@ -180,7 +180,7 @@ plans:
         max_length: 4
         display_group: Microsoft SQL Config
       - name: MSSQL_IMAGE_PULL
-        title: "DeploymentConfig Image pull policy"
+        title: "DeploymentConfig Image Pull Policy"
         type: enum
         enum: ['Always', 'IfNotPresent', 'Never']
         required: true
