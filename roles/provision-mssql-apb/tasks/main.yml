@@ -114,7 +114,6 @@
                 BEGIN
                   CREATE DATABASE {{ mssql_db }}
                 END"
-          initialDelaySeconds: 15
           timeoutSeconds: 2
         resources:
           limits:
@@ -182,7 +181,6 @@
                 BEGIN
                   CREATE DATABASE {{ mssql_db }}
                 END"
-          initialDelaySeconds: 15
           timeoutSeconds: 2
         resources:
           limits:
