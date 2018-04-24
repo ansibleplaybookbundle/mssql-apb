@@ -117,10 +117,10 @@
         imagePullPolicy: '{{ mssql_image_pull }}'
         name: '{{ service_name }}'
         livenessProbe:
-          initialDelaySeconds: 30
+          initialDelaySeconds: 60
+          periodSeconds: 20
           tcpSocket:
             port: 1433
-          timeoutSeconds: 1
         readinessProbe:
           exec:
             command:
@@ -132,8 +132,7 @@
                 BEGIN
                   CREATE DATABASE {{ mssql_db }}
                 END"
-          initialDelaySeconds: 10
-          timeoutSeconds: 1
+          timeoutSeconds: 2
         resources:
           limits:
             memory: '{{ memory_limit }}G'
@@ -185,10 +184,10 @@
         imagePullPolicy: '{{ mssql_image_pull }}'
         name: '{{ service_name }}'
         livenessProbe:
-          initialDelaySeconds: 30
+          initialDelaySeconds: 60
+          periodSeconds: 20
           tcpSocket:
             port: 1433
-          timeoutSeconds: 1
         readinessProbe:
           exec:
             command:
@@ -200,8 +199,7 @@
                 BEGIN
                   CREATE DATABASE {{ mssql_db }}
                 END"
-          initialDelaySeconds: 10
-          timeoutSeconds: 1
+          timeoutSeconds: 2
         resources:
           limits:
             memory: '{{ memory_limit }}G'

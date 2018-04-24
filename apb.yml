@@ -31,7 +31,7 @@ plans:
         required: true
         default: false
         description: http://go.microsoft.com/fwlink/?LinkId=746388
-        display_group: EULA Required
+        display_group: Required - EULA
       - name: MSSQL_PASSWORD
         required: true
         default: "Hello123!"
@@ -88,7 +88,7 @@ plans:
         max_length: 4
         display_group: Microsoft SQL Config
       - name: MSSQL_IMAGE_PULL
-        title: "DeploymentConfig Image pull policy"
+        title: "DeploymentConfig Image Pull Policy"
         type: enum
         enum: ['Always', 'IfNotPresent', 'Never']
         required: true
@@ -125,7 +125,7 @@ plans:
         required: true
         default: false
         description: http://go.microsoft.com/fwlink/?LinkId=746388
-        display_group: EULA Required
+        display_group: Required - EULA
       - name: MSSQL_PASSWORD
         required: true
         default: "Hello123!"
@@ -182,7 +182,7 @@ plans:
         max_length: 4
         display_group: Microsoft SQL Config
       - name: MSSQL_IMAGE_PULL
-        title: "DeploymentConfig Image pull policy"
+        title: "DeploymentConfig Image Pull Policy"
         type: enum
         enum: ['Always', 'IfNotPresent', 'Never']
         required: true
